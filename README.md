@@ -42,7 +42,7 @@ Le script tentera ensuite d'extraire des données de l'URL fournie, et le fichie
 
     www.alltricks.fr:       OK
     www.culturevelo.com:    Incomplet (en cours de développement)
-    www.materiel-velo.com:  OK
+    www.materiel-velo.com:  Incomplet (en cours de développement)
     my-velo.fr:             Incomplet (en cours de développement)
 
 ## Signalement de Bugs
