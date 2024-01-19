@@ -19,10 +19,10 @@ echo Fait.
 echo Copie des fichiers...
 if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
 
-echo @echo off > ".\spyke\launching.bat"
-echo python3 %INSTALL_DIR%\main.py >> ".\spyke\launching.bat"
+echo @echo off > ".\launching.bat"
+echo python3 %INSTALL_DIR%\main.py >> ".\launching.bat"
 
-xcopy /s ".\spyke" "%INSTALL_DIR%"
+xcopy /s "." "%INSTALL_DIR%"
 if %errorlevel% neq 0 (
     echo Erreur inattendue lors de la copie des fichiers!
     exit /b

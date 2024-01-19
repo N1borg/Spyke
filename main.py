@@ -1,5 +1,5 @@
-import re
 import os
+from re import match
 from datetime import datetime
 from urllib.parse import urlparse
 import core.alltricks as alt
@@ -7,8 +7,7 @@ import core.culturevelo as cuv
 import core.materiel_velo as mav
 import core.my_velo as myv
 
-csv_path_file = ""
-DEFAULT_FOLDER_FILE = 'default_folder.txt'
+DEFAULT_FOLDER_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "default_folder.txt")
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36"
 }
@@ -20,7 +19,7 @@ def is_url(url):
     domain = urlparse(url).netloc
     compatible_website_found = any(domain == website.get_url() for website in WEBSITES)
 
-    if not re.match(url_pattern, url) or not compatible_website_found:
+    if not match(url_pattern, url) or not compatible_website_found:
         print("Mauvais format d'URL ou domaine incompatible!")
         if not compatible_website_found:
             print(f"Le script est compatible avec ces sites:")
@@ -29,13 +28,16 @@ def is_url(url):
     return True
 
 def verify_folder_path():
-    if os.path.exists(DEFAULT_FOLDER_FILE):
+    try:
         with open(DEFAULT_FOLDER_FILE, 'r') as file:
             folder_path = file.read().strip()
             if folder_path and os.path.exists(folder_path) and os.path.isdir(folder_path):
                 use_remembered = input(f"Réutiliser le dossier par défaut '{folder_path}'? (oui/non): ").lower()
                 if use_remembered in {'oui', 'o', ''}:
                     return folder_path
+    except FileNotFoundError:
+        pass
+
     while True:
         folder_path = input("Chemin d'enregistrement du CSV: ")
         if os.path.exists(folder_path) and os.path.isdir(folder_path):
@@ -60,12 +62,12 @@ def run_url(url, csv_file):
     for website in WEBSITES:
         if domain in website.get_url():
             website.main(page, csv_file, HEADERS)
-            exit(0)
+            return
     print(f"Pas de domaine correspondant à {url}\nLe script est compatible avec ces sites:")
     display_websites(WEBSITES)
 
 def main():
-    global csv_path_file
+    csv_path_file = ""
 
     # Website URL to parse
     url = input("Entrez l'URL de la page de cette forme 'https://site.tld/page': ")

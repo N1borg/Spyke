@@ -14,11 +14,9 @@ def get_num_art(html):
     })
 
     if num_articles:
-        num_articles = num_articles.text.strip().split()[0]
-        num_articles = int(num_articles)
+        num_articles = int(num_articles.text.strip().split()[0])
         return num_articles
-    else:
-        return 0
+    raise ValueError("Erreur lors de la récupération du nombre d'articles.")
 
 def parse_page(url, output_file, headers):
     global nArticles
@@ -54,7 +52,6 @@ def parse_page(url, output_file, headers):
     else:
         print("Erreur lors de l'accès au site:", url)
         exit(1)
-
 
 def parse_pages(url, output_file, headers):
     global nArticles

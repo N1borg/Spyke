@@ -14,15 +14,13 @@ def get_num_art(html):
     })
 
     if num_articles:
-        num_articles = num_articles.text.strip().split()[0]
-        num_articles = int(num_articles)
+        num_articles = int(num_articles.text.strip().split()[0])
         return num_articles
-    else:
-        return 0
+    raise ValueError("Erreur lors de la récupération du nombre d'articles.")
 
-def get_pages(url, headers):
+def get_pages(url, headers, session):
     global nArticles
-    response = requests.get(url, headers=headers)
+    response = session.get(url, headers=headers)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -36,9 +34,8 @@ def get_pages(url, headers):
             'data-pager-current-page': '1'
         })
 
-        if (not parent_div):
-            print("Erreur lors de la récupération des articles.")
-            return None
+        if not parent_div:
+            raise ValueError("Erreur lors de la récupération des articles.")
 
         ajax_urls = [item['data-ajax-url'].strip() for item in parent_div.find_all('div', attrs={
             'class': 'alltricks-Pager__item',
@@ -46,14 +43,13 @@ def get_pages(url, headers):
         })]
         return ajax_urls
     else:
-        print("Erreur lors de l'accès au site:", url)
-        return None
+        raise ValueError(f"Erreur lors de l'accès au site : {url}")
 
-def parse_page(url, output_file, headers):
+def parse_page(url, output_file, headers, session):
     global nArticles
     global nArticlesDone
 
-    response = requests.get(url, headers=headers)
+    response = session.get(url, headers=headers)
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
@@ -64,6 +60,9 @@ def parse_page(url, output_file, headers):
             'data-productread': '',
             'data-controller': 'selectItemDatalayerEvent addToCartDatalayerEvent wishlist'
         })
+
+        if not parent_divs:
+            raise ValueError("Erreur lors de la récupération des articles.")
 
         for parent_div in parent_divs:
             brand_label = parent_div.find('strong', attrs={
@@ -80,19 +79,23 @@ def parse_page(url, output_file, headers):
             nArticlesDone += 1
             loading_bar(nArticles, nArticlesDone)
     else:
-        print("Erreur lors de la structuration des données:", url)
-        return None
+        raise ValueError(f"Erreur lors de la structuration des données : {url}")
 
 def main(page, csv_file, headers):
     url = f"https://{get_url()}"
-    ajax_urls = get_pages(url + page, headers)
+    with requests.Session() as session:
+        try:
+            ajax_urls = get_pages(url + page, headers, session)
 
-    if ajax_urls is not None:
-        with open(csv_file, 'a', encoding='utf-8') as output_file:
-            output_file.write("Marque;Modèle;Prix\n")
-            for ajax_url in ajax_urls:
-                parse_page(url + ajax_url, output_file, headers)
-        print(f"\nNombre de résultats affichés par le site: {nArticles}\nNombre de résultats trouvés: {nArticlesDone}")
-    else:
-        print("Pas de page trouvée!")
-        exit(1)
+            if ajax_urls is not None:
+                with open(csv_file, 'a', encoding='utf-8') as output_file:
+                    output_file.write("Marque;Modèle;Prix\n")
+                    for ajax_url in ajax_urls:
+                        print(url + ajax_url)
+                        parse_page(url + ajax_url, output_file, headers, session)
+                print(f"\nNombre de résultats affichés par le site: {nArticles}\nNombre de résultats trouvés: {nArticlesDone}")
+            else:
+                print("Pas de page trouvée!")
+                exit(1)
+        except ValueError as e:
+            print(f"Erreur : {str(e)}")
