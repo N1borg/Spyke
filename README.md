@@ -34,7 +34,8 @@ Après l'installation, vous pouvez exécuter le script Spyke en utilisant le scr
 
     C:\Users\%USERNAME%\Documents\spyke\launching.bat
 
-Le script vous demandera d'entrer l'URL de la page que vous souhaitez extraire.
+Le script vous demandera d'entrer l'URL de la page que vous souhaitez extraire. Il suffit de faire la recherche sur le site avec les filtres souhaités et de copuer l'URL de la page directement dans le programme.
+
 Suivez les invites pour sélectionner le dossier de sortie CSV, fournir un préfixe de fichier CSV et confirmer l'exécution.
 Le script tentera ensuite d'extraire des données de l'URL fournie, et le fichier CSV résultant sera enregistré dans le dossier spécifié.
 
@@ -42,8 +43,8 @@ Le script tentera ensuite d'extraire des données de l'URL fournie, et le fichie
 
     www.alltricks.fr:       OK
     www.culturevelo.com:    Incomplet (en cours de développement)
-    www.materiel-velo.com:  Incomplet (en cours de développement)
-    my-velo.fr:             Incomplet (en cours de développement)
+    www.materiel-velo.com:  OK
+    my-velo.fr:             OK
 
 ## Signalement de Bugs
 

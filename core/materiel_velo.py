@@ -11,10 +11,14 @@ def get_url():
 def get_num_art(html):
     num_articles = html.find('p', attrs={
         'class' : 'u-txt-sm u-txt-dark u-mb-0'
-    }).text.strip().split()[0]
+    })
 
-    num_articles = int(num_articles)
-    return num_articles
+    if num_articles:
+        num_articles = num_articles.text.strip().split()[0]
+        num_articles = int(num_articles)
+        return num_articles
+    else:
+        return 0
 
 def parse_page(url, output_file, headers):
     global nArticles
@@ -54,9 +58,10 @@ def main(page, csv_file, headers):
 
     with open(csv_file, 'a', encoding='utf-8') as output_file:
         output_file.write("Marque;Modèle;Prix\n")
-        returned = 1
         i = 1
-        while returned != 0:
+        while True:
             returned = parse_page(url + page + "&page=" + str(i), output_file, headers)
             i += 1
-        print()
+            if returned == 0 or nArticlesDone >= nArticles:
+                break
+        print(f"\nNombre de résultats affichés par le site: {nArticles}\nNombre de résultats trouvés: {nArticlesDone}")

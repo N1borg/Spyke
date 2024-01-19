@@ -12,7 +12,6 @@ DEFAULT_FOLDER_FILE = 'default_folder.txt'
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36"
 }
-
 WEBSITES = [alt, cuv, mav, myv]
 
 def is_url(url):
@@ -62,7 +61,7 @@ def run_url(url, csv_file):
         if domain in website.get_url():
             website.main(page, csv_file, HEADERS)
             exit(0)
-    print(f"Pas de domaine correspondant à {url}\nLe script n'est compatible qu'avec ces sites:")
+    print(f"Pas de domaine correspondant à {url}\nLe script est compatible avec ces sites:")
     display_websites(WEBSITES)
 
 def main():
@@ -80,8 +79,8 @@ def main():
         csv_path_file += '/'
 
     # CSV file prefix
-    prefix = input("Préfix fichier CSV: ")
-    csv_filename = f"export-{prefix}{'-' if prefix else ''}{datetime.now().strftime('%d-%m-%Y_%H-%M')}.csv"
+    prefix = input("Préfixe du fichier CSV: ")
+    csv_filename = f"export-{prefix}{'-' if prefix else ''}{datetime.now().strftime('%d-%m-%Y_%H-%M-%S')}.csv"
     csv_file = os.path.join(csv_path_file, csv_filename)
     print(csv_file)
 

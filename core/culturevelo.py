@@ -1,16 +1,22 @@
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+from core.loading_bar import loading_bar
 
-n_products_site = n_products = 0
+n_products = 0
 
 def get_url():
     return "www.culturevelo.com"
 
-def get_num_articles(url, headers):
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
+def get_nproducts(url, headers):
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+    query_params['productsPerPage'] = ["1"]
+    new_url = urlunparse(parsed_url._replace(query=urlencode(query_params, doseq=True)))
 
+    response = requests.get(new_url, headers=headers)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text.strip(), 'html.parser')
         number_articles = soup.find('div', class_='count')
         if number_articles:
             return int(number_articles.text)
@@ -20,7 +26,7 @@ def get_num_articles(url, headers):
         print("Site: Pas de produit trouvé!")
         exit(0)
     else:
-        print("Erreur lors de l'accès au site:", url)
+        print("Erreur lors de l'accès au site:", new_url)
         exit(0)
 
 def parse_article(parent_div, output_file, n_products_site):
@@ -29,38 +35,51 @@ def parse_article(parent_div, output_file, n_products_site):
     if articles:
         for article in articles:
             article_label = article.find('h3')
-            if article_label:
+            article_model = article.find('h4')
+            article_price = article.find('div', class_='dalle-prix')
+            if article_label and article_model and article_price:
                 n_products += 1
-                print(f"Parsing {n_products}/{n_products_site}...")
-                article_model = article.find('h4').find(string=True, recursive=False) if article.find('h4') else None
-                article_price = article.find('div', class_='dalle-prix')
-                if article_model and article_price:
-                    print(f"{article_label.text};{article_model};{article_price.text}")
-                    output_file.write(f"{article_label.text};{article_model};{article_price.text}\n")
-
-def main(qarticle, csv_file, headers):
-    page = f"https://{get_url()}/shop/Produits/ListeFF"
-    product_per_page = 1
-    parameters = f"?productsPerPage={product_per_page}&query="
-    url = page + parameters + qarticle
-    n_products_site = get_num_articles(url, headers)
-    if not n_products_site > 0:
-        print("Pas de produit trouvé!")
-        exit(0)
-    parameters = f"?productsPerPage={n_products_site}&query="
-    url = page + parameters + qarticle
-    print(f"{n_products_site} produits trouvé(s)!")
-    print("...")
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-        parent_div = soup.find('div', attrs={'class': 'velos', 'id': 'LISTE'})
+                loading_bar(n_products_site, n_products)
+                output_file.write(f"{article_label.text.strip()};{article_model.text.strip()};{article_price.text.strip()}\n")
+            else:
+                print("Erreur lors de récupération des informations du produit.")
+                return 0
+        return 1
     else:
-        print("Erreur lors de l'accès au site:", url)
-    if not parent_div:
-        print("Erreur lors de la structuration des données!")
-        exit(0)
-    with open(csv_file, 'a', encoding='utf-8') as output_file:
-        output_file.write("Marque;Modèle;Prix\n")
-        parse_article(parent_div, output_file, n_products_site)        
-    print(f"Nombre de résultats affichés par le site: {n_products_site}\nNombre de résultats trouvés: {n_products}")
+        print("Erreur lors de la structuration des produits.")
+        return 0
+
+def main(page, csv_file, headers):
+    url = f"https://{get_url()}" + page
+    n_products_site = get_nproducts(url, headers)
+
+    if n_products_site <= 0:
+        print("Aucun produit trouvé.")
+        exit(1)
+
+    print(f"{n_products_site} produits trouvé(s)!")
+
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+    query_params['productsPerPage'] = [str(n_products_site)]
+    new_url = urlunparse(parsed_url._replace(query=urlencode(query_params, doseq=True)))
+    returned = i = 1
+    while returned == 1:
+        print("URL:", new_url + "&page=" + str(i))
+        response = requests.get(new_url + "&page=" + str(i), headers=headers)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            parent_div = soup.find('div', attrs={
+                'id': 'LISTE',
+                'class': 'velos'
+            })
+        else:
+            print("Erreur lors de l'accès au site:", new_url)
+        if not parent_div:
+            print("Erreur lors de la structuration des données!")
+            exit(0)
+        with open(csv_file, 'a', encoding='utf-8') as output_file:
+            output_file.write("Marque;Modèle;Prix\n")
+            returned = parse_article(parent_div, output_file, n_products_site) 
+        i += 1
+    print(f"\nNombre de résultats affichés par le site: {n_products_site}\nNombre de résultats trouvés: {n_products}")

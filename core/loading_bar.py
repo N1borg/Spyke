@@ -6,4 +6,4 @@ def loading_bar(max_value, current_value):
     bar = "[" + "█" * num_blocks + "-" * (bar_length - num_blocks) + "]"
     percentage = round(progress * 100, 2)
 
-    print(f"\r{bar} {percentage}% complete", end="", flush=True)
+    print(f"\r{bar} {percentage}% complété", end="", flush=True)

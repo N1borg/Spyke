@@ -11,9 +11,14 @@ def get_url():
 def get_num_art(html):
     num_articles = html.find('div', attrs={
         'class' : 'alltricks-ProductListingHeader__item--left'
-    }).text.strip().split()[0]
-    num_articles = int(num_articles)
-    return num_articles
+    })
+
+    if num_articles:
+        num_articles = num_articles.text.strip().split()[0]
+        num_articles = int(num_articles)
+        return num_articles
+    else:
+        return 0
 
 def get_pages(url, headers):
     global nArticles
@@ -47,6 +52,7 @@ def get_pages(url, headers):
 def parse_page(url, output_file, headers):
     global nArticles
     global nArticlesDone
+
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
@@ -86,7 +92,7 @@ def main(page, csv_file, headers):
             output_file.write("Marque;Modèle;Prix\n")
             for ajax_url in ajax_urls:
                 parse_page(url + ajax_url, output_file, headers)
-            print()
+        print(f"\nNombre de résultats affichés par le site: {nArticles}\nNombre de résultats trouvés: {nArticlesDone}")
     else:
         print("Pas de page trouvée!")
         exit(1)
