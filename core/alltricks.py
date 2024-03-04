@@ -20,11 +20,14 @@ def get_num_art(html):
 
 def get_pages(url, headers, session):
     global nArticles
+
     response = session.get(url, headers=headers)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
 
         nArticles = get_num_art(soup)
+
+        # /I-Page2_100
 
         parent_div = soup.find('div', attrs={
             'id': 'alltricks-Pager',

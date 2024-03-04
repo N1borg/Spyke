@@ -65,8 +65,8 @@ def main(page, csv_file, headers):
     new_url = urlunparse(parsed_url._replace(query=urlencode(query_params, doseq=True)))
     returned = i = 1
     while returned == 1:
-        print("URL:", new_url + "&page=" + str(i))
-        response = requests.get(new_url + "&page=" + str(i), headers=headers)
+        print(f"{new_url}?page={str(i)}" if "?" not in page else f"{new_url}&page={str(i)}")
+        response = requests.get(f"{new_url}?page={str(i)}" if "?" not in page else f"{new_url}&page={str(i)}", headers=headers)
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
             parent_div = soup.find('div', attrs={

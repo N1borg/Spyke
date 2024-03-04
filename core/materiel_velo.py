@@ -14,9 +14,13 @@ def get_num_art(html):
     })
 
     if num_articles:
-        num_articles = int(num_articles.text.strip().split()[0])
-        return num_articles
-    raise ValueError("Erreur lors de la récupération du nombre d'articles.")
+        try:
+            num_articles = int(num_articles.text.strip().split()[0])
+            return num_articles
+        except ValueError:
+            print("Erreur lors de la récupération du nombre d'articles.")
+    else:
+        print("Erreur lors de la récupération du nombre d'articles.")
 
 def parse_page(url, output_file, headers, session):
     global nArticles
@@ -59,7 +63,7 @@ def main(page, csv_file, headers):
             output_file.write("Marque;Modèle;Prix\n")
             i = 1
             while True:
-                returned = parse_page(f"{url}{page}&page={str(i)}", output_file, headers, session)
+                returned = parse_page(f"{url}{page}?page={str(i)}" if "?" not in page else f"{url}{page}&page={str(i)}", output_file, headers, session)
                 i += 1
                 if returned == 0 or nArticlesDone >= nArticles:
                     break

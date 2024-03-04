@@ -14,8 +14,11 @@ def get_num_art(html):
     })
 
     if num_articles:
-        num_articles = int(num_articles.text.strip().split()[0])
-        return num_articles
+        try:
+            num_articles = int(num_articles.text.strip().split()[0])
+            return num_articles
+        except ValueError:
+            pass
     raise ValueError("Erreur lors de la récupération du nombre d'articles.")
 
 def parse_page(url, output_file, headers):
@@ -48,6 +51,11 @@ def parse_page(url, output_file, headers):
                 'title' : 'Suivant',
                 'rel' : 'next'
             })
+        if not is_next:
+            is_next = soup.find('a', attrs={
+                'class' : 'page-link next js-search-link',
+                'rel' : 'next'
+            })
         return is_next
     else:
         print("Erreur lors de l'accès au site:", url)
@@ -60,7 +68,11 @@ def parse_pages(url, output_file, headers):
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
-        nArticles = get_num_art(soup)
+        try:
+            nArticles = get_num_art(soup)
+        except:
+            print("Erreur lors de la récupération du nombre d'articles.")
+            nArticles = 0
 
         output_file.write("Marque;Modèle;Prix\n")
 
@@ -71,7 +83,7 @@ def parse_pages(url, output_file, headers):
             if not is_next:
                 break
             i += 1
-            page = "&p=" + str(i)
+            page = "?page=" + str(i) if "?" not in url else "&page=" + str(i)
     else:
         print("Erreur lors de l'accès au site:", url)
         return 0
