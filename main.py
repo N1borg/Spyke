@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import os
 from re import match
 from datetime import datetime
@@ -68,6 +71,7 @@ def run_url(url, csv_file):
 
 def main():
     csv_path_file = ""
+    print("Le script est compatible avec ces sites:")
 
     # Website URL to parse
     url = input("Entrez l'URL de la page de cette forme 'https://site.tld/page': ")
