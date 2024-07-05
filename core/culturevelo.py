@@ -10,7 +10,7 @@ def get_url():
     return "www.culturevelo.com"
 
 
-def get_nproducts(url, headers):
+def get_num_art(url, headers):
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
     query_params['productsPerPage'] = ["1"]
@@ -54,8 +54,12 @@ def parse_article(parent_div, output_file, n_products_site):
 
 
 def main(page, csv_file, headers):
+    abort = input("ATTENTION !\nLe site culturevelo.com n'est plus compatible avec le script. Souhaitez-vous continuer? (oui/non): ")
+    if abort.lower() not in {'oui', 'o', ''}:
+        exit(0)
+
     url = f"https://{get_url()}" + page
-    n_products_site = get_nproducts(url, headers)
+    n_products_site = get_num_art(url, headers)
 
     if n_products_site <= 0:
         print("Aucun produit trouvé.")

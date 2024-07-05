@@ -19,11 +19,18 @@ def get_num_art(page):
         pattern = r'<span>(\d+) articles</span>'
         match = re.search(pattern, response.text)
 
-        if match:
-            num_articles = int(match.group(1))
-            return num_articles
-
-    raise ValueError("Can't get number of articles.")
+        try:
+            if match:
+                num_articles = int(match.group(1))
+                return num_articles
+        except ValueError:
+            raise ValueError("Can't get number of articles.")
+    elif response.status_code == 302:
+        print("Site: Pas de produit trouvé!")
+        exit(0)
+    else:
+        print("Erreur lors de l'accès au site:", url)
+        exit(0)
 
 
 def parse_pages(url, page, csv_file, headers):
@@ -35,7 +42,7 @@ def parse_pages(url, page, csv_file, headers):
             i = 1
             if "/Acheter/" in page:
                 while True:
-                    response = session.get(f"{url}/ajax/pagination{page}?Page={i}", headers=headers)
+                    response = session.get(f"{url}/ajax/pagination{page}{'&' if '?' in page else '?'}Page={i}", headers=headers)
                     soup = BeautifulSoup(response.text, 'html.parser')
                     articles = soup.find_all('div', attrs={
                         'class': 'alltricks-Product'

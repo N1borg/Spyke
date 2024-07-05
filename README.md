@@ -45,6 +45,7 @@ Le script tentera ensuite d'extraire des données de l'URL fournie, et le fichie
 - [ ] www.culturevelo.com
 - [x] www.materiel-velo.com
 - [x] my-velo.fr
+- [x] www.probikeshop.fr
 
 ## Signalement de Bugs
 

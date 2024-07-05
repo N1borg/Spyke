@@ -9,12 +9,13 @@ import core.alltricks as alt
 import core.culturevelo as cuv
 import core.materiel_velo as mav
 import core.my_velo as myv
+import core.probikeshop as pbs
 
 DEFAULT_FOLDER_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "default_folder.txt")
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36"
 }
-WEBSITES = [alt, cuv, mav, myv]
+WEBSITES = [alt, cuv, mav, myv, pbs]
 
 def is_url(url):
     url_pattern = r"^http(s)?://[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&/=]*)$"
@@ -95,7 +96,7 @@ def main():
     user_agree = input("Continuer? (oui/non) ").lower()
     if user_agree in {'oui', 'o', ''}:
         run_url(url, csv_file)
-        print("Terminé.")
+        input("Terminé.")
     else:
         print("Abandonné.")
         exit(0)
