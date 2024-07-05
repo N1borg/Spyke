@@ -14,7 +14,6 @@ def get_url():
 def get_num_art(page):
     url = f"https://{get_url()}{page}{'&' if '?' in page else '?'}frz-smartcache-fragment=true&frz-timeout=5000&frz-smartcache-v=2"
     response = requests.get(url)
-    print(f"URL: {url}")
 
     if response.status_code == 200:
         pattern = r'<span>(\d+) articles</span>'
@@ -35,34 +34,63 @@ def parse_pages(url, page, csv_file, headers):
         output_file.write("Marque;Modèle;Prix\n")
         with requests.Session() as session:
             i = 1
-            while True:
-                response = session.get(f"{url}/ajax/pagination{page}?Page={i}", headers=headers)
-                soup = BeautifulSoup(response.text, 'html.parser')
-                articles = soup.find_all('div', attrs={
-                    'class': 'alltricks-Product'
-                })
+            if "/Acheter/" in page:
+                while True:
+                    response = session.get(f"{url}/ajax/pagination{page}?Page={i}", headers=headers)
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    articles = soup.find_all('div', attrs={
+                        'class': 'alltricks-Product'
+                    })
 
-                if response.status_code != 200 or not articles:
-                    if i == 1:
-                        raise ValueError("No articles found.")
-                    break
+                    if response.status_code != 200 or not articles:
+                        break
 
-                for article in articles:
-                    brand = article.find('strong', attrs={
-                        'class': 'alltricks-Product-brandLabel'
-                    }).text.strip()
-                    model = article.find('a', attrs={
-                        'class': 'alltricks-Product-description'
-                    }).text.strip()
-                    price = article.find('span', attrs={
-                        'class': 'alltricks-Product-price'
-                    }).text.strip()
+                    for article in articles:
+                        brand = article.find('strong', attrs={
+                            'class': 'alltricks-Product-brandLabel'
+                        }).text.strip()
+                        model = article.find('a', attrs={
+                            'class': 'alltricks-Product-description'
+                        }).text.strip()
+                        price = article.find('span', attrs={
+                            'class': 'alltricks-Product-price'
+                        }).text.strip()
 
-                    nArticlesDone += 1
-                    output_file.write(f"{brand};{model};{price}\n")
-                    loading_bar(nArticles, nArticlesDone)
+                        nArticlesDone += 1
+                        output_file.write(f"{brand};{model};{price}\n")
+                        loading_bar(nArticles, nArticlesDone)
 
-                i += 1
+                    i += 1
+            else:
+                while True:
+                    response = session.get(f"{url}/ajax/pagination{page}/I-Page{i}_120", headers=headers)
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    articles = soup.find_all('div', attrs={
+                        'class': 'alltricks-Product'
+                    })
+
+                    if response.status_code != 200 or not articles:
+                        break
+
+                    for article in articles:
+                        brand = article.find('strong', attrs={
+                            'class': 'alltricks-Product-brandLabel'
+                        }).text.strip()
+                        model = article.find('a', attrs={
+                            'class': 'alltricks-Product-description'
+                        }).text.strip()
+                        price = article.find('span', attrs={
+                            'class': 'alltricks-Product-price'
+                        }).text.strip()
+
+                        nArticlesDone += 1
+                        output_file.write(f"{brand};{model};{price}\n")
+                        loading_bar(nArticles, nArticlesDone)
+
+                    i += 1
+        
+        if nArticlesDone == 0:
+            raise ValueError("No articles found.")
 
 
 def main(page, csv_file, headers):
