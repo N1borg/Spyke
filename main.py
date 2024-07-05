@@ -72,6 +72,7 @@ def run_url(url, csv_file):
 def main():
     csv_path_file = ""
     print("Le script est compatible avec ces sites:")
+    display_websites(WEBSITES)
 
     # Website URL to parse
     url = input("Entrez l'URL de la page de cette forme 'https://site.tld/page': ")
