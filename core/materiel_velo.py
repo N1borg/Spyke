@@ -2,11 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 from core.loading_bar import loading_bar
 
-nArticles = -1
+nArticles = 0
 nArticlesDone = 0
+
 
 def get_url():
     return "www.materiel-velo.com"
+
 
 def get_num_art(html):
     num_articles = html.find('p', attrs={
@@ -22,7 +24,8 @@ def get_num_art(html):
     else:
         print("Erreur lors de la récupération du nombre d'articles.")
 
-def parse_page(url, output_file, headers, session):
+
+def parse_page(url, output_file, headers, session : requests.Session):
     global nArticles
     global nArticlesDone
 
@@ -31,6 +34,7 @@ def parse_page(url, output_file, headers, session):
         soup = BeautifulSoup(response.text, 'html.parser')
         if nArticles == -1:
             nArticles = get_num_art(soup)
+            print(f"Articles: {nArticles}")
 
         articles = soup.find_all('div', attrs={
             'class' : 'c-pdt-mini__body'
@@ -55,6 +59,7 @@ def parse_page(url, output_file, headers, session):
         print("Erreur lors de l'accès au site:", url)
         return 0
 
+
 def main(page, csv_file, headers):
     url = f"https://{get_url()}"
 
@@ -67,4 +72,4 @@ def main(page, csv_file, headers):
                 i += 1
                 if returned == 0 or nArticlesDone >= nArticles:
                     break
-            print(f"\nNombre de résultats affichés par le site: {nArticles}\nNombre de résultats trouvés: {nArticlesDone}")
+            print(f"\n\nNombre de résultats affichés par le site: {nArticles}\nNombre de résultats trouvés: {nArticlesDone}")

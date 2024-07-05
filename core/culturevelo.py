@@ -5,8 +5,10 @@ from core.loading_bar import loading_bar
 
 n_products = 0
 
+
 def get_url():
     return "www.culturevelo.com"
+
 
 def get_nproducts(url, headers):
     parsed_url = urlparse(url)
@@ -29,6 +31,7 @@ def get_nproducts(url, headers):
         print("Erreur lors de l'accès au site:", new_url)
         exit(0)
 
+
 def parse_article(parent_div, output_file, n_products_site):
     global n_products
     articles = parent_div.find_all('a')
@@ -48,6 +51,7 @@ def parse_article(parent_div, output_file, n_products_site):
     else:
         print("Erreur lors de la structuration des produits.")
         return 0
+
 
 def main(page, csv_file, headers):
     url = f"https://{get_url()}" + page

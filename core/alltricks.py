@@ -21,7 +21,6 @@ def get_num_art(page):
 
         if match:
             num_articles = int(match.group(1))
-            print(f"Articles: {num_articles}")
             return num_articles
 
     raise ValueError("Can't get number of articles.")
@@ -100,6 +99,7 @@ def main(page, csv_file, headers):
     try:
         try:
             nArticles = get_num_art(page)
+            print(f"Articles: {nArticles}")
         except ValueError as e:
             print(f"Erreur : {str(e)}")
 

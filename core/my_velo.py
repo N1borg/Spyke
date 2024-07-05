@@ -2,24 +2,27 @@ import requests
 from bs4 import BeautifulSoup
 from core.loading_bar import loading_bar
 
-nArticles = -1
+nArticles = 0
 nArticlesDone = 0
+
 
 def get_url():
     return "my-velo.fr"
 
+
 def get_num_art(html):
-    num_articles = html.find('span', attrs={
-        'class' : 'heading-counter'
+    num_articles = html.find('small', attrs={
+        'class' : 'PM_ASBlockNbProductValue'
     })
 
     if num_articles:
         try:
-            num_articles = int(num_articles.text.strip().split()[0])
+            num_articles = int(num_articles.text.strip().split()[0].strip('()'))
             return num_articles
         except ValueError:
             pass
     raise ValueError("Erreur lors de la récupération du nombre d'articles.")
+
 
 def parse_page(url, output_file, headers):
     global nArticles
@@ -61,6 +64,7 @@ def parse_page(url, output_file, headers):
         print("Erreur lors de l'accès au site:", url)
         exit(1)
 
+
 def parse_pages(url, output_file, headers):
     global nArticles
     global nArticlesDone
@@ -70,6 +74,7 @@ def parse_pages(url, output_file, headers):
         soup = BeautifulSoup(response.text, 'html.parser')
         try:
             nArticles = get_num_art(soup)
+            print(f"Articles: {nArticles}")
         except:
             print("Erreur lors de la récupération du nombre d'articles.")
             nArticles = 0
@@ -88,9 +93,10 @@ def parse_pages(url, output_file, headers):
         print("Erreur lors de l'accès au site:", url)
         return 0
 
+
 def main(page, csv_file, headers):
     url = f"https://{get_url()}"
 
     with open(csv_file, 'a', encoding='utf-8') as output_file:
         parse_pages(url + page, output_file, headers)
-        print(f"\nNombre de résultats affichés par le site: {nArticles}\nNombre de résultats trouvés: {nArticlesDone}")
+        print(f"\n\nNombre de résultats affichés par le site: {nArticles}\nNombre de résultats trouvés: {nArticlesDone}")
