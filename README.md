@@ -41,10 +41,10 @@ Le script tentera ensuite d'extraire des données de l'URL fournie, et le fichie
 
 ## État sites Web pris en charge
 
-    www.alltricks.fr:       Incomplet (en cours de développement)
-    www.culturevelo.com:    Incomplet (en cours de développement)
-    www.materiel-velo.com:  OK
-    my-velo.fr:             OK
+- [x] www.alltricks.fr
+- [ ] www.culturevelo.com
+- [x] www.materiel-velo.com
+- [x] my-velo.fr
 
 ## Signalement de Bugs
 
