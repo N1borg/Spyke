@@ -42,7 +42,7 @@ Le script tentera ensuite d'extraire des données de l'URL fournie, et le fichie
 ## État sites Web pris en charge
 
 - [x] www.alltricks.fr
-- [ ] www.culturevelo.com
+- [ ] www.culturevelo.com (OBSOLETE! NON MAINTENU)
 - [x] www.materiel-velo.com
 - [x] my-velo.fr
 - [x] www.probikeshop.fr
